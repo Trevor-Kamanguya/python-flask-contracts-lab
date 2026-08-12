@@ -6,5 +6,30 @@ contracts = [{"id": 1, "contract_information": "This contract is for John and bu
 customers = ["bob","bill","john","sarah"]
 app = Flask(__name__)
 
+
+@app.route('/contract/<int:id>')
+def get_contract(id):
+    # Search for a contract matching the given id
+    contract = next((c for c in contracts if c["id"] == id), None)
+
+    if contract:
+        # Contract found - return its information with a 200 OK
+        return make_response(contract["contract_information"], 200)
+    else:
+        # Contract not found - return a 404
+        return make_response(f"Contract with id {id} not found", 404)
+
+
+@app.route('/customer/<customer_name>')
+def get_customer(customer_name):
+    # Check if the customer exists, but never expose their sensitive data
+    if customer_name in customers:
+        # Customer found - confirm existence with 204, no body content
+        return make_response('', 204)
+    else:
+        # Customer not found - return a 404
+        return make_response(f"Customer {customer_name} not found", 404)
+
+
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
